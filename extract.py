@@ -3,17 +3,68 @@ import shutil
 import os
 from os import listdir
 from os.path import isfile, join, dirname, splitext
-
+from ctypes import *
 
 fileList = [ 
     f for f in listdir(dirname(__file__)) if isfile(join(dirname(__file__), f))
 ]
 
+class resource_versions(Structure):
+    _fields_ = [("field_0", c_int),
+                ("field_4", c_int),
+                ("field_8", c_int),
+                ("field_C", c_int),
+                ("field_10", c_int)]
+                
+class resource_amalgapak_header(Structure):
+    _fields_ = [("field_0", resource_versions),
+                ("field_14", c_int),
+                ("field_18", c_int),
+                ("header_size", c_int),
+                ("location_table_size", c_int),
+                ("field_24", c_int),
+                ("memory_map_table_size", c_int),
+                ("field_2C", c_int),
+                ("prerequisite_table_size", c_int),
+                ("field_34", c_int)]
+
+assert(sizeof(resource_versions) == 0x14)
+
+class string_hash(Structure):
+    _fields_ = [("field_0", c_int)]
+
+class resource_key(Structure):
+    _fields_ = [("m_hash", string_hash),
+                ("m_type", c_int)
+                ]
+
+class resource_location(Structure):
+    _fields_ = [("field_0", resource_key),
+                ("field_8", c_int),
+                ("m_size", c_int)
+                ]
+
+
+class resource_pack_location(Structure):
+    _fields_ = [("loc", resource_location),
+                ("field_10", c_int),
+                ("field_14", c_int),
+                ("field_18", c_int),
+                ("field_1C", c_int),
+                ("prerequisite_offset", c_int),
+                ("prerequisite_count", c_int),
+                ("field_28", c_int),
+                ("field_2C", c_int),
+                ("m_name", c_char * 32)
+                ]
+                
+assert(sizeof(resource_pack_location) == 0x50)
+
 #Header_Section 0x38
 #LBA_Section 0xBFE0
 #FileData Individual Section 0x50
 
-DEV_MODE = 0
+DEV_MODE = 1
 
 for file in fileList:
     _, ext = splitext(file)
@@ -23,88 +74,48 @@ for file in fileList:
             rPack.seek(0, 2)
             numOfBytes = rPack.tell()
             print("Total Size:", numOfBytes, "bytes")
-
-            #RESOURCE_PACK_VERSION
+            
             rPack.seek(0, 0)
-            rpVersion = rPack.read(4)
-            rpVersion = int.from_bytes(rpVersion, 'little')
-            #RESOURCE_ENTITY_MASH_VERSION
-            rPack.seek(4, 0)
-            rpEMV = rPack.read(4)
-            rpEMV = int.from_bytes(rpEMV, 'little')
-            #RESOURCE_NOENTITY_MASH_VERSION
-            rPack.seek(8, 0)
-            rpNEMV = rPack.read(4)
-            rpNEMV = int.from_bytes(rpNEMV, 'little')
-            #RESOURCE_AUTO_MASH_VERSION
-            rPack.seek(12, 0)
-            rpAMV = rPack.read(4)
-            rpAMV = int.from_bytes(rpAMV, 'little')
-            #RESOURCE_RAW_MASH_VERSION
-            rPack.seek(16, 0)
-            rpRMV = rPack.read(4)
-            rpRMV = int.from_bytes(rpRMV, 'little')
+            pack_file_header = resource_amalgapak_header()
+            rPack.readinto(pack_file_header)
+            
+            rpVersion = pack_file_header.field_0.field_0
+            
             #Header Section Size
-            rPack.seek(28, 0)
-            headerSize = rPack.read(4)
-            headerSize = int.from_bytes(headerSize, 'little')
+            headerSize = pack_file_header.header_size
+            
             #LBA_SECTION
-            rPack.seek(32, 0)
-            lbaSize = rPack.read(4)
-            lbaSize = int.from_bytes(lbaSize, 'little')
+            location_table_size = pack_file_header.location_table_size
 
             if rpVersion == 14:
                 print("Game: Ultimate Spider-Man NTSC 1.0")
             elif rpVersion == 10:
                 print("Game: Ultimate Spider-Man NTSC 06/20/2005 Prototype")
 
+            base_offset = pack_file_header.field_18
+
             if DEV_MODE == 1:
                 print("\nDeveloper info:\n")
-                print("RESOURCE_PACK_VERSION", rpVersion)
-                print("RESOURCE_ENTITY_MASH_VERSION", rpEMV)
-                print("RESOURCE_NOENTITY_MASH_VERSION", rpNEMV)
-                print("RESOURCE_AUTO_MASH_VERSION", rpAMV)
-                print("RESOURCE_RAW_MASH_VERSION", rpRMV)
-                print("Header Section Size:", headerSize, "bytes")
-                print("LBA Section Size:", lbaSize, "bytes")
-            
+                
+                versions = pack_file_header.field_0
+                print("RESOURCE_PACK_VERSION", versions.field_0)
+                print("RESOURCE_ENTITY_MASH_VERSION", versions.field_4)
+                print("RESOURCE_NOENTITY_MASH_VERSION", versions.field_8)
+                print("RESOURCE_AUTO_MASH_VERSION", versions.field_C)
+                print("RESOURCE_RAW_MASH_VERSION", versions.field_10)
+                
+                print("base_offset:", hex(base_offset))
+                
+                print("Header Section Size:", hex(headerSize), "bytes")
+                print("LBA Section Size:", hex(location_table_size), "bytes")
 
             #Read LBA
-            rPack.seek(headerSize, 0)
-            rpLBA = rPack.read(lbaSize)
-            rpLBA = [rpLBA[i:i+80] for i in range(0, len(rpLBA), 80)]
-            print(len(rpLBA), "Files detected")
-
-            fileIndex = 0
-            lbafile = open("lba.txt", mode="w")
-            for fileIndex in range(len(rpLBA)):
-                fname = rpLBA[fileIndex]
-                ndisplay = fname[48:80]
-                ndisplay = ndisplay.decode('utf-8')
-                filesize = fname[24:28]
-                filesize = int.from_bytes(filesize, 'little')
-                offset1 = fname[0:4]
-                offset1 = int.from_bytes(offset1, 'little')
-                offset2 = fname[4:8]
-                offset2 = int.from_bytes(offset2, 'little')
-                offset3 = fname[8:12]
-                offset3 = int.from_bytes(offset3, 'little')
-                offset4 = fname[12:16]
-                offset4 = int.from_bytes(offset4, 'little')
-                offset9 = fname[32:36]
-                offset9 = int.from_bytes(offset9, 'little')
-                offseta = fname[36:40]
-                offseta = int.from_bytes(offseta, 'little')
-                offsetb = fname[40:44]
-                offsetb = int.from_bytes(offsetb, 'little')
-                lbaargs = (ndisplay, "-", hex(filesize), hex(offset1), hex(offset2), hex(offset3), hex(offset4), hex(offset9), hex(offseta), hex(offsetb), "\n")
-                ws = ' '.join(lbaargs)
-                if DEV_MODE == 1:
-                    print(ws)
-                lbafile.write(ws)
-                fileIndex =+ 1
-            lbafile.close()
-            print("LBA Extracted")
+            amalgapak_pack_location_table_t = resource_pack_location * int(location_table_size / 0x50)
+            amalgapak_pack_location_table = amalgapak_pack_location_table_t()
+            rPack.readinto(amalgapak_pack_location_table)
+            
+            amalgapak_pack_location_count = len(amalgapak_pack_location_table)
+            print(amalgapak_pack_location_count, "Files detected")
 
             folder = "resourcepack"
             try:
@@ -113,24 +124,26 @@ for file in fileList:
                 print ("Creation of the directory %s failed" % folder)
             else:
                 print ("Successfully created the directory %s " % folder)
-            fileindex = 0
-            DataSec = 65536
-            rPack.seek(DataSec, 0)
-            for fileIndex in range(len(rpLBA)):
-                fname = rpLBA[fileIndex]
-                ndisplay = fname[48:80]
-                ndisplay = ndisplay.decode('utf-8')
-                filesize = fname[24:28]
-                filesize = int.from_bytes(filesize, 'little')
-                filepath = os.path.join(folder, ndisplay + ".nfl")
+                
+            for fileIndex in range(amalgapak_pack_location_count):
+                pack_loc = amalgapak_pack_location_table[fileIndex]
+                ndisplay = pack_loc.m_name.decode('utf-8')
+                print(ndisplay)
+                offset_loc = pack_loc.loc.field_8
+                filesize = pack_loc.loc.m_size
+                
+                filepath = os.path.join(folder, ndisplay + ".XBPACK")
                 filepath = ''.join(x for x in filepath if x.isprintable())
+                
+                rPack.seek(base_offset + offset_loc, 0)
+                
                 filePos = rPack.tell()
                 print(filepath, hex(filePos))
+                
                 nfldata = rPack.read(filesize)
                 nflfile = open(filepath, mode="wb")
                 nflfile.write(nfldata)
                 nflfile.close()
-                fileIndex =+ 1
             
 
-input("\nDone.")
+print("\nDone.")
