@@ -1,7 +1,8 @@
 import io
 import sys
+import os
 
-sys.path.append(r"./src")
+sys.path.append(os.path.join(sys.path[0], 'src'))
 from generic_mash_header import *
 from resource_pack_header import *
 from mashable_vector import *

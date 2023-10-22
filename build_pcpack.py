@@ -5,7 +5,7 @@ from itertools import repeat
 
 from read_pcpack import *
 
-sys.path.append(r"./src")
+sys.path.append(os.path.join(sys.path[0], 'src'))
 from generic_mash_header import *
 from resource_pack_header import *
 from resource_directory import *

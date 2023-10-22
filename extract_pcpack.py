@@ -1,21 +1,13 @@
 import io
-import shutil
 import os
 import sys
 from os import listdir
 from os.path import isfile, join, dirname, splitext
 from ctypes import *
-from typing import overload
-from itertools import repeat
 
-sys.path.append(r"./src")
+sys.path.append(os.path.join(sys.path[0], 'src'))
 from generic_mash_data_ptrs import *
 from read_pcpack import *
-
-def to_int(x):
-    result = int.from_bytes(bytes(x), "little")
-    #print("to_int: 0x%08X" % result)
-    return result
 
 class resource_pack_location(Structure):
     _fields_ = [("loc", resource_location),
@@ -36,10 +28,11 @@ DEV_MODE = 1
 
 
 def main(file):
+    print()
+    print(os.path.join('.', 'src'))
     name_pak, ext = splitext(file)
 
     if ext != ".PCPACK":
-        print("File must be contain *.PCPACK extension")
         return
 
     _, _, directory, buffer_bytes = read_pack(file)
@@ -73,5 +66,14 @@ def main(file):
     print("\nDone.")
 
 
+fileList = [
+    f for f in listdir(dirname(__file__)) if isfile(join(dirname(__file__), f))
+]
+
 if __name__ == '__main__':
-    main(sys.argv[1])
+    if len(sys.argv) == 2:
+        main(sys.argv[1])
+    else:
+        for file in fileList:
+            main(file)
+
