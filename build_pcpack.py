@@ -151,5 +151,13 @@ def main(file):
     build_pack(name_pak, pack_header, mash_header, directory, len(buffer_bytes))
 
 
+fileList = [
+    f for f in listdir(dirname(__file__)) if isfile(join(dirname(__file__), f))
+]
+
 if __name__ == '__main__':
-    main(sys.argv[1])
+    if len(sys.argv) == 2:
+        main(sys.argv[1])
+    else:
+        for file in fileList:
+            main(file)
