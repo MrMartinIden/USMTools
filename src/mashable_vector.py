@@ -24,27 +24,22 @@ class mashable_vector(Structure):
     def empty(self) -> bool:
         return self.size() == 0
 
-    def custom_un_mash(self, a4: generic_mash_data_ptrs, buffer_bytes) -> generic_mash_data_ptrs:
+    def custom_un_mash(self, a4: generic_mash_data_ptrs) -> generic_mash_data_ptrs:
         print("custom_un_mash")
 
         a4.rebase(4)
         a4.rebase(4)
 
-        offset = int(a4.field_0)
-        a4.field_0 += 4 * self.m_size
-
-        array_type = c_int * int(self.m_size)
-        size = sizeof(array_type)
-        array_data = array_type.from_buffer_copy(buffer_bytes[offset : offset + size])
+        array_data = a4.get(c_int, int(self.m_size))
         self.m_data = cast(array_data, POINTER(c_int))
 
         a4.rebase(4)
 
         return a4
 
-    def un_mash(self, a4: generic_mash_data_ptrs, buffer_bytes) -> generic_mash_data_ptrs:
+    def un_mash(self, a4: generic_mash_data_ptrs) -> generic_mash_data_ptrs:
         assert(self.from_mash())
-        return self.custom_un_mash(a4, buffer_bytes)
+        return self.custom_un_mash(a4)
 
 class mashable_vector__resource_location(Structure):
     _fields_ = [("m_data", POINTER(resource_location)),
@@ -66,20 +61,16 @@ class mashable_vector__resource_location(Structure):
     def empty(self) -> bool:
         return self.size() == 0
 
-    def custom_un_mash(self, a4: generic_mash_data_ptrs, buffer_bytes) -> generic_mash_data_ptrs:
+    def custom_un_mash(self, a4: generic_mash_data_ptrs) -> generic_mash_data_ptrs:
         print("custom_un_mash<resource_location>")
 
         a4.rebase(8)
         a4.rebase(4)
 
-        print("0x%08X" % a4.field_0)
+        offset = int(a4.field_0.tell())
+        print("0x%08X" % offset)
 
-        offset = int(a4.field_0)
-        a4.field_0 += sizeof(resource_location) * self.m_size
-
-        array_type = resource_location * int(self.m_size)
-        size = sizeof(array_type)
-        array_data = array_type.from_buffer_copy(buffer_bytes[offset : offset + size])
+        array_data = a4.get(resource_location, int(self.m_size))
         self.m_data = cast(array_data, POINTER(resource_location))
 
         a4.rebase(4)
@@ -107,18 +98,16 @@ class mashable_vector__tlresource_location(Structure):
     def empty(self) -> bool:
         return self.size() == 0
 
-    def custom_un_mash(self, a4: generic_mash_data_ptrs, buffer_bytes) -> generic_mash_data_ptrs:
+    def custom_un_mash(self, a4: generic_mash_data_ptrs) -> generic_mash_data_ptrs:
         print("custom_un_mash<tlresource_location>")
 
         a4.rebase(8)
         a4.rebase(4)
 
-        offset = int(a4.field_0)
-        a4.field_0 += sizeof(tlresource_location) * self.m_size
+        offset = int(a4.field_0.tell())
+        print("0x%08X" % offset)
 
-        array_type = tlresource_location * int(self.m_size)
-        size = sizeof(array_type)
-        array_data = array_type.from_buffer_copy(buffer_bytes[offset : offset + size])
+        array_data = a4.get(tlresource_location, int(self.m_size))
         self.m_data = cast(array_data, POINTER(tlresource_location))
 
         a4.rebase(4)

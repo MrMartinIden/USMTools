@@ -141,34 +141,34 @@ class resource_directory(Structure):
         locations = self.tlresource_type_to_vector(a1);
         return locations.size();
 
-    def un_mash_start(self, a4: generic_mash_data_ptrs, buffer_bytes) -> generic_mash_data_ptrs:
+    def un_mash_start(self, a4: generic_mash_data_ptrs) -> generic_mash_data_ptrs:
         a4.rebase(8)
 
-        a4 = self.parents.un_mash(a4, buffer_bytes)
+        a4 = self.parents.un_mash(a4)
 
-        a4 = self.resource_locations.custom_un_mash(a4, buffer_bytes)
+        a4 = self.resource_locations.custom_un_mash(a4)
 
-        a4 = self.texture_locations.custom_un_mash(a4, buffer_bytes)
+        a4 = self.texture_locations.custom_un_mash(a4)
 
-        a4 = self.mesh_file_locations.custom_un_mash(a4, buffer_bytes)
+        a4 = self.mesh_file_locations.custom_un_mash(a4)
 
-        a4 = self.mesh_locations.custom_un_mash(a4, buffer_bytes)
+        a4 = self.mesh_locations.custom_un_mash(a4)
 
-        a4 = self.morph_file_locations.custom_un_mash(a4, buffer_bytes)
+        a4 = self.morph_file_locations.custom_un_mash(a4)
 
-        a4 = self.morph_locations.custom_un_mash(a4, buffer_bytes)
+        a4 = self.morph_locations.custom_un_mash(a4)
 
-        a4 = self.material_file_locations.custom_un_mash(a4, buffer_bytes)
+        a4 = self.material_file_locations.custom_un_mash(a4)
 
-        a4 = self.material_locations.custom_un_mash(a4, buffer_bytes)
+        a4 = self.material_locations.custom_un_mash(a4)
 
-        a4 = self.anim_file_locations.custom_un_mash(a4, buffer_bytes)
+        a4 = self.anim_file_locations.custom_un_mash(a4)
 
-        a4 = self.anim_locations.custom_un_mash(a4, buffer_bytes)
+        a4 = self.anim_locations.custom_un_mash(a4)
 
-        a4 = self.scene_anim_locations.custom_un_mash(a4, buffer_bytes)
+        a4 = self.scene_anim_locations.custom_un_mash(a4)
 
-        a4 = self.skeleton_locations.custom_un_mash(a4, buffer_bytes)
+        a4 = self.skeleton_locations.custom_un_mash(a4)
 
         def validate(vector, tlresource_type):
             for i in range(vector.m_size):

@@ -21,7 +21,8 @@ def read_pack(file):
         numOfBytes = rPack.tell()
         print("Total Size:", numOfBytes, "bytes")
 
-        pack_header = resource_pack_header.from_buffer_copy(buffer_bytes[0:sizeof(resource_pack_header)])
+        rPack.seek(0, 0)
+        pack_header = resource_pack_header.from_buffer_copy(rPack.read(sizeof(resource_pack_header)))
 
         rpVersion = pack_header.field_0.field_0
 
@@ -33,12 +34,13 @@ def read_pack(file):
         directory_offset = pack_header.directory_offset
         base = pack_header.res_dir_mash_size
 
-        mash_header = generic_mash_header.from_buffer_copy(buffer_bytes[directory_offset : (directory_offset + sizeof(generic_mash_header))])
+        rPack.seek(directory_offset)
+        mash_header = generic_mash_header.from_buffer_copy(rPack.read(sizeof(generic_mash_header)))
         print(mash_header)
 
         cur_ptr = directory_offset + sizeof(generic_mash_header)
 
-        directory = resource_directory.from_buffer_copy(buffer_bytes[cur_ptr : cur_ptr + sizeof(resource_directory)])
+        directory = resource_directory.from_buffer_copy(rPack.read(sizeof(resource_directory)))
         print(directory)
 
         assert(directory.parents.from_mash())
@@ -49,14 +51,15 @@ def read_pack(file):
         assert(directory.morph_file_locations.from_mash())
         assert(directory.morph_locations.from_mash())
 
-        mash_data_ptrs = generic_mash_data_ptrs()
-        mash_data_ptrs.field_0 = cur_ptr + sizeof(resource_directory)
-        mash_data_ptrs.field_4 = directory_offset + mash_header.field_8
+        mash_data_ptrs = generic_mash_data_ptrs(rPack, rPack)
+
+        #mash_data_ptrs.field_0 = cur_ptr + sizeof(resource_directory)
+        #mash_data_ptrs.field_4 = directory_offset + mash_header.field_8
         print(mash_data_ptrs)
 
         assert(directory_offset % 4 == 0)
 
-        directory.un_mash_start(mash_data_ptrs, buffer_bytes)
+        directory.un_mash_start(mash_data_ptrs)
 
         directory.constructor_common(base, 0, pack_header.field_20 - base, pack_header.field_24)
 
