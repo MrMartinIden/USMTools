@@ -367,8 +367,7 @@ def read_meshfile(file):
             print("\nidx = %d" % i)
 
             offset = Header.DirectoryEntries + i * sizeof(nglDirectoryEntry)
-            print("0x%X" % offset);
-            exit();
+            print("Offset = 0x%X" % offset);
 
             entry = nglDirectoryEntry.from_buffer_copy(buffer_bytes[offset : (offset + sizeof(nglDirectoryEntry))])
             print("typeDirectoryEntry = %s" % ("MATERIAL" if int.from_bytes(entry.typeDirectoryEntry) == 1 else "MESH") )
@@ -394,82 +393,15 @@ def read_meshfile(file):
 
                 read_mesh(mesh, buffer_bytes)
 
-        return
-
-        directory_offset = pack_header.directory_offset
-        base = pack_header.res_dir_mash_size
-
-        mash_header = generic_mash_header.from_buffer_copy(buffer_bytes[directory_offset : (directory_offset + sizeof(generic_mash_header))])
-        print(mash_header)
-
-        cur_ptr = directory_offset + sizeof(generic_mash_header)
-
-        directory = resource_directory.from_buffer_copy(buffer_bytes[cur_ptr : cur_ptr + sizeof(resource_directory)])
-        print(directory)
-
-        assert(directory.parents.from_mash())
-        assert(directory.resource_locations.from_mash())
-        assert(directory.texture_locations.from_mash())
-        assert(directory.mesh_file_locations.from_mash())
-        assert(directory.mesh_locations.from_mash())
-        assert(directory.morph_file_locations.from_mash())
-        assert(directory.morph_locations.from_mash())
-
-        mash_data_ptrs = generic_mash_data_ptrs()
-        mash_data_ptrs.field_0 = cur_ptr + sizeof(resource_directory)
-        mash_data_ptrs.field_4 = directory_offset + mash_header.field_8
-        print(mash_data_ptrs)
-
-        assert(directory_offset % 4 == 0)
-
-        directory.un_mash_start(mash_data_ptrs, buffer_bytes)
-
-        directory.constructor_common(base, 0, pack_header.field_20 - base, pack_header.field_24)
-
-        assert(directory.get_tlresource_count( TLRESOURCE_TYPE_MESH_FILE ) == directory.get_resource_count( RESOURCE_KEY_TYPE_MESH_FILE_STRUCT ))
-
-        assert(directory.get_tlresource_count( TLRESOURCE_TYPE_MATERIAL_FILE ) == directory.get_resource_count( RESOURCE_KEY_TYPE_MATERIAL_FILE_STRUCT ))
-
-        return (pack_header, mash_header, directory, buffer_bytes)
-
 
 def main(file):
-    print()
-    print(os.path.join('.', 'src'))
     name_pak, ext = splitext(file)
 
     if ext != ".PCMESH":
+        print('Extension of file must be PCMESH')
         return
 
-    _, _, directory, buffer_bytes = read_meshfile(file)
-    return
-
-    folder = name_pak
-    try:
-        os.mkdir(folder)
-    except OSError:
-        print ("Creation of the directory %s failed" % folder)
-    else:
-        print ("Successfully created the directory %s " % folder)
-
-    for i in range(directory.resource_locations.size()):
-        res_loc: resource_location = directory.get_resource_location(i)
-        #print(res_loc)
-
-        mash_data_size = res_loc.m_size
-        resource_idx = directory.get_resource(res_loc)
-
-        ndisplay = res_loc.field_0.get_platform_string()
-        filepath = os.path.join(folder, ndisplay)
-        filepath = ''.join(x for x in filepath if x.isprintable())
-        resource_file = open(filepath, mode="wb")
-
-        resource_data = buffer_bytes[resource_idx : resource_idx + mash_data_size]
-        resource_file.write(resource_data)
-        resource_file.close()
-
-        print("range: {0:#X} {1:#x}".format(resource_idx, resource_idx + mash_data_size))
-
+    read_meshfile(file)
     print("\nDone.")
 
 
