@@ -67,7 +67,7 @@ class resource_directory(Structure):
 
         assert(i < self.resource_locations.size())
 
-        res = self.resource_locations.m_data[i]
+        res = self._resource_locations_ptr[i]
         return res
 
     def get_mash_data(self, offset: int) -> int:
@@ -144,62 +144,62 @@ class resource_directory(Structure):
     def un_mash_start(self, a4: generic_mash_data_ptrs) -> generic_mash_data_ptrs:
         a4.rebase(8)
 
-        a4 = self.parents.un_mash(a4)
+        a4, self._parents_ptr = self.parents.un_mash(a4)
 
-        a4 = self.resource_locations.custom_un_mash(a4)
+        a4, self._resource_locations_ptr = self.resource_locations.custom_un_mash(a4)
 
-        a4 = self.texture_locations.custom_un_mash(a4)
+        a4, self._texture_locations_ptr = self.texture_locations.custom_un_mash(a4)
 
-        a4 = self.mesh_file_locations.custom_un_mash(a4)
+        a4, self._mesh_file_locations_ptr = self.mesh_file_locations.custom_un_mash(a4)
 
-        a4 = self.mesh_locations.custom_un_mash(a4)
+        a4, self._mesh_locations_ptr = self.mesh_locations.custom_un_mash(a4)
 
-        a4 = self.morph_file_locations.custom_un_mash(a4)
+        a4, self._morph_file_locations_ptr = self.morph_file_locations.custom_un_mash(a4)
 
-        a4 = self.morph_locations.custom_un_mash(a4)
+        a4, self._morph_locations_ptr = self.morph_locations.custom_un_mash(a4)
 
-        a4 = self.material_file_locations.custom_un_mash(a4)
+        a4, self._material_file_locations_ptr = self.material_file_locations.custom_un_mash(a4)
 
-        a4 = self.material_locations.custom_un_mash(a4)
+        a4, self._material_locations_ptr = self.material_locations.custom_un_mash(a4)
 
-        a4 = self.anim_file_locations.custom_un_mash(a4)
+        a4, self._anim_file_locations_ptr = self.anim_file_locations.custom_un_mash(a4)
 
-        a4 = self.anim_locations.custom_un_mash(a4)
+        a4, self._anim_locations_ptr = self.anim_locations.custom_un_mash(a4)
 
-        a4 = self.scene_anim_locations.custom_un_mash(a4)
+        a4, self._scene_anim_locations_ptr = self.scene_anim_locations.custom_un_mash(a4)
 
-        a4 = self.skeleton_locations.custom_un_mash(a4)
+        a4, self._skeleton_locations_ptr = self.skeleton_locations.custom_un_mash(a4)
 
-        def validate(vector, tlresource_type):
+        def validate(vector, ptr, tlresource_type):
             for i in range(vector.m_size):
-                tlres_loc = vector.m_data[i]
+                tlres_loc = ptr[i]
 
                 if tlresource_type == TLRESOURCE_TYPE_TEXTURE:
                     print(tlres_loc)
 
                 assert(tlres_loc.get_type() == tlresource_type)
 
-        validate(self.texture_locations, TLRESOURCE_TYPE_TEXTURE)
+        validate(self.texture_locations, self._texture_locations_ptr, TLRESOURCE_TYPE_TEXTURE)
 
-        validate(self.mesh_file_locations, TLRESOURCE_TYPE_MESH_FILE)
+        validate(self.mesh_file_locations, self._mesh_file_locations_ptr, TLRESOURCE_TYPE_MESH_FILE)
 
-        validate(self.mesh_locations, TLRESOURCE_TYPE_MESH)
+        validate(self.mesh_locations, self._mesh_locations_ptr, TLRESOURCE_TYPE_MESH)
 
-        validate(self.morph_file_locations, TLRESOURCE_TYPE_MORPH_FILE)
+        validate(self.morph_file_locations, self._morph_file_locations_ptr, TLRESOURCE_TYPE_MORPH_FILE)
 
-        validate(self.morph_locations, TLRESOURCE_TYPE_MORPH)
+        validate(self.morph_locations, self._morph_locations_ptr, TLRESOURCE_TYPE_MORPH)
 
-        validate(self.material_file_locations, TLRESOURCE_TYPE_MATERIAL_FILE)
+        validate(self.material_file_locations, self._material_file_locations_ptr, TLRESOURCE_TYPE_MATERIAL_FILE)
 
-        validate(self.material_locations, TLRESOURCE_TYPE_MATERIAL)
+        validate(self.material_locations, self._material_locations_ptr, TLRESOURCE_TYPE_MATERIAL)
 
-        validate(self.anim_file_locations, TLRESOURCE_TYPE_ANIM_FILE)
+        validate(self.anim_file_locations, self._anim_file_locations_ptr, TLRESOURCE_TYPE_ANIM_FILE)
 
-        validate(self.anim_locations, TLRESOURCE_TYPE_ANIM)
+        validate(self.anim_locations, self._anim_locations_ptr, TLRESOURCE_TYPE_ANIM)
 
-        validate(self.scene_anim_locations, TLRESOURCE_TYPE_SCENE_ANIM)
+        validate(self.scene_anim_locations, self._scene_anim_locations_ptr, TLRESOURCE_TYPE_SCENE_ANIM)
 
-        validate(self.skeleton_locations, TLRESOURCE_TYPE_SKELETON)
+        validate(self.skeleton_locations, self._skeleton_locations_ptr, TLRESOURCE_TYPE_SKELETON)
 
         return a4
 

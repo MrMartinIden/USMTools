@@ -5,7 +5,7 @@ from resource_location import *
 from tlresource_location import *
 
 class mashable_vector(Structure):
-    _fields_ = [("m_data", POINTER(c_int)),
+    _fields_ = [("m_data", c_uint32),
                ("m_size", c_short),
                ("m_shared", c_bool),
                ("field_7", c_bool)
@@ -24,25 +24,25 @@ class mashable_vector(Structure):
     def empty(self) -> bool:
         return self.size() == 0
 
-    def custom_un_mash(self, a4: generic_mash_data_ptrs) -> generic_mash_data_ptrs:
+    def custom_un_mash(self, a4: generic_mash_data_ptrs):
         print("custom_un_mash")
 
         a4.rebase(4)
         a4.rebase(4)
 
         array_data = a4.get(c_int, int(self.m_size))
-        self.m_data = cast(array_data, POINTER(c_int))
+        m_data_ptr = cast(array_data, POINTER(c_int))
 
         a4.rebase(4)
 
-        return a4
+        return a4, m_data_ptr
 
-    def un_mash(self, a4: generic_mash_data_ptrs) -> generic_mash_data_ptrs:
+    def un_mash(self, a4: generic_mash_data_ptrs):
         assert(self.from_mash())
         return self.custom_un_mash(a4)
 
 class mashable_vector__resource_location(Structure):
-    _fields_ = [("m_data", POINTER(resource_location)),
+    _fields_ = [("m_data", c_uint32),
                ("m_size", c_short),
                ("m_shared", c_bool),
                ("field_7", c_bool)
@@ -61,7 +61,7 @@ class mashable_vector__resource_location(Structure):
     def empty(self) -> bool:
         return self.size() == 0
 
-    def custom_un_mash(self, a4: generic_mash_data_ptrs) -> generic_mash_data_ptrs:
+    def custom_un_mash(self, a4: generic_mash_data_ptrs):
         print("custom_un_mash<resource_location>")
 
         a4.rebase(8)
@@ -71,15 +71,15 @@ class mashable_vector__resource_location(Structure):
         print("0x%08X" % offset)
 
         array_data = a4.get(resource_location, int(self.m_size))
-        self.m_data = cast(array_data, POINTER(resource_location))
+        m_data_ptr = cast(array_data, POINTER(resource_location))
 
         a4.rebase(4)
 
-        return a4
+        return a4, m_data_ptr
 
 
 class mashable_vector__tlresource_location(Structure):
-    _fields_ = [("m_data", POINTER(tlresource_location)),
+    _fields_ = [("m_data", c_uint32),
                ("m_size", c_short),
                ("m_shared", c_bool),
                ("field_7", c_bool)
@@ -98,7 +98,7 @@ class mashable_vector__tlresource_location(Structure):
     def empty(self) -> bool:
         return self.size() == 0
 
-    def custom_un_mash(self, a4: generic_mash_data_ptrs) -> generic_mash_data_ptrs:
+    def custom_un_mash(self, a4: generic_mash_data_ptrs):
         print("custom_un_mash<tlresource_location>")
 
         a4.rebase(8)
@@ -108,12 +108,12 @@ class mashable_vector__tlresource_location(Structure):
         print("0x%08X" % offset)
 
         array_data = a4.get(tlresource_location, int(self.m_size))
-        self.m_data = cast(array_data, POINTER(tlresource_location))
+        m_data_ptr = cast(array_data, POINTER(tlresource_location))
 
         a4.rebase(4)
-        return a4
+        return a4, m_data_ptr
 
-    def un_mash(self, a4: generic_mash_data_ptrs) -> generic_mash_data_ptrs:
+    def un_mash(self, a4: generic_mash_data_ptrs):
         assert(self.from_mash())
         return self.custom_un_mash(a4)
 

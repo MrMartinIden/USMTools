@@ -155,15 +155,15 @@ class nglTexture(Structure):
 
 class nglMaterialBase(Structure):
     _fields_ = [("Name", c_int),
-                ("field_4", POINTER(nglShader)),
+                ("field_4", c_uint32), # <----- nglShader
                 ("File", c_int),
                 ("NextMaterial", c_int),
                 ("field_10", c_int),
                 ("field_14", c_int),
-                ("field_18", POINTER(tlFixedString)),
-                ("field_1C", POINTER(nglTexture)),
-                ("field_20", POINTER(nglTexture)),
-                ("field_24", POINTER(nglTexture)),
+                ("field_18", c_uint32), # <----- tlFixedString
+                ("field_1C", c_uint32), # <----- nglTexture
+                ("field_20", c_uint32), # <----- nglTexture
+                ("field_24", c_uint32), # <----- nglTexture
                 ("field_28", vector4d),
                 ("field_38", c_float),
                 ("field_3C", c_int),
@@ -173,7 +173,7 @@ class nglMaterialBase(Structure):
                 ("m_blend_mode", c_int),
                 ]
 
-#assert(sizeof(nglMaterialBase) == 0x50)
+assert(sizeof(nglMaterialBase) == 0x50)
 
 DEV_MODE = 1
 

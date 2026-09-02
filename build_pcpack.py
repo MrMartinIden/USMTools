@@ -33,19 +33,19 @@ def build_pack(name, pack_header: resource_pack_header,
     resource_file.write(bytes(mash_header))
 
     res_dir = resource_directory.from_buffer_copy(bytes(directory))
-    res_dir.parents.m_data = None
-    res_dir.resource_locations.m_data = None
-    res_dir.texture_locations.m_data = None
-    res_dir.mesh_file_locations.m_data = None
-    res_dir.mesh_locations.m_data = None
-    res_dir.morph_file_locations.m_data = None
-    res_dir.morph_locations.m_data = None
-    res_dir.material_file_locations.m_data = None
-    res_dir.material_locations.m_data = None
-    res_dir.anim_file_locations.m_data = None
-    res_dir.anim_locations.m_data = None
-    res_dir.scene_anim_locations.m_data = None
-    res_dir.skeleton_locations.m_data = None
+    res_dir.parents.m_data = 0
+    res_dir.resource_locations.m_data = 0
+    res_dir.texture_locations.m_data = 0
+    res_dir.mesh_file_locations.m_data = 0
+    res_dir.mesh_locations.m_data = 0
+    res_dir.morph_file_locations.m_data = 0
+    res_dir.morph_locations.m_data = 0
+    res_dir.material_file_locations.m_data = 0
+    res_dir.material_locations.m_data = 0
+    res_dir.anim_file_locations.m_data = 0
+    res_dir.anim_locations.m_data = 0
+    res_dir.scene_anim_locations.m_data = 0
+    res_dir.skeleton_locations.m_data = 0
 
     resource_file.write(bytes(res_dir))
 
@@ -57,7 +57,7 @@ def build_pack(name, pack_header: resource_pack_header,
 
     resource_file.seek(offset, 0)
 
-    data = directory.parents.m_data[0].to_bytes(4, "little")
+    data = directory._parents_ptr[0].to_bytes(4, "little")
     print(data)
     resource_file.write(data)
 
@@ -70,46 +70,46 @@ def build_pack(name, pack_header: resource_pack_header,
     resource_file.seek(offset, 0)
 
     for i in range(directory.resource_locations.m_size):
-        data = bytes(directory.resource_locations.m_data[i])
+        data = bytes(directory._resource_locations_ptr[i])
         resource_file.write(data)
 
     offset = resource_file.tell()
     offset = rebase(offset, 4, resource_file)
 
-    def save(vector, f):
+    def save(vector, ptr, f):
         offset = f.tell()
         offset = rebase(offset, 8, f)
         offset = rebase(offset, 4, f)
         resource_file.seek(offset, 0)
 
         for i in range(vector.m_size):
-            tlres_loc = vector.m_data[i]
+            tlres_loc = ptr[i]
             resource_file.write(tlres_loc)
 
         offset = f.tell()
         offset = rebase(offset, 4, f)
 
-    save(directory.texture_locations, resource_file)
+    save(directory.texture_locations, directory._texture_locations_ptr, resource_file)
 
-    save(directory.mesh_file_locations, resource_file)
+    save(directory.mesh_file_locations, directory._mesh_file_locations_ptr, resource_file)
 
-    save(directory.mesh_locations, resource_file)
+    save(directory.mesh_locations, directory._mesh_locations_ptr, resource_file)
 
-    save(directory.morph_file_locations, resource_file)
+    save(directory.morph_file_locations, directory._morph_file_locations_ptr, resource_file)
 
-    save(directory.morph_locations, resource_file)
+    save(directory.morph_locations, directory._morph_locations_ptr, resource_file)
 
-    save(directory.material_file_locations, resource_file)
+    save(directory.material_file_locations, directory._material_file_locations_ptr, resource_file)
 
-    save(directory.material_locations, resource_file)
+    save(directory.material_locations, directory._material_locations_ptr, resource_file)
 
-    save(directory.anim_file_locations, resource_file)
+    save(directory.anim_file_locations, directory._anim_file_locations_ptr, resource_file)
 
-    save(directory.anim_locations, resource_file)
+    save(directory.anim_locations, directory._anim_locations_ptr, resource_file)
 
-    save(directory.scene_anim_locations, resource_file)
+    save(directory.scene_anim_locations, directory._scene_anim_locations_ptr, resource_file)
 
-    save(directory.skeleton_locations, resource_file)
+    save(directory.skeleton_locations, directory._skeleton_locations_ptr, resource_file)
 
     folder = name
     for i in range(directory.resource_locations.size()):
