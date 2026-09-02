@@ -1,5 +1,5 @@
 from ctypes import *
-from resource_key import *
+from .resource_key import *
 
 class resource_location(Structure):
     _fields_ = [("field_0", resource_key),

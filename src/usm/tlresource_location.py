@@ -1,5 +1,5 @@
 from ctypes import *
-from string_hash import *
+from .string_hash import *
 
 class tlresource_location(Structure):
     _fields_ = [("name", string_hash),

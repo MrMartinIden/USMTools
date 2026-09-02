@@ -1,5 +1,5 @@
 from ctypes import *
-from resource_versions import *
+from .resource_versions import *
 
 class resource_pack_header(Structure):
     _fields_ = [("field_0", resource_versions),
