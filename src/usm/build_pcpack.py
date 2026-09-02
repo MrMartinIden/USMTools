@@ -1,15 +1,16 @@
+import argparse
 import sys
 import os
+import pathlib
 from os import listdir
 from os.path import isfile, join, dirname, splitext
 from itertools import repeat
 
-from read_pcpack import *
+from .read_pcpack import *
 
-sys.path.append(os.path.join(sys.path[0], 'src'))
-from generic_mash_header import *
-from resource_pack_header import *
-from resource_directory import *
+from .generic_mash_header import *
+from .resource_pack_header import *
+from .resource_directory import *
 
 
 def rebase(x, i, f):
@@ -140,25 +141,29 @@ def build_pack(name, pack_header: resource_pack_header,
         resource_file.write(data)
 
 
-def main(file):
-    name_pak, ext = splitext(file)
+def main():
+    p = argparse.ArgumentParser(
+        prog="pack",
+        description="Build PACK file from directory with assets.",
+    )
+
+    p.add_argument("input", help=".PACK file")
+
+    args = p.parse_args()
+
+    input_path = os.path.abspath(args.input)
+    if not input_path:
+        sys.exit("No .pack files found.")
+
+    name_pak, ext = splitext(input_path)
 
     if ext != ".PCPACK":
-        print("File must be contain *.PCPACK extension")
-        return
+        sys.exit("File must be contain *.PCPACK extension")
 
-    pack_header, mash_header, directory, buffer_bytes = read_pack(file)
+    pack_header, mash_header, directory, buffer_bytes = read_pack(input_path)
 
     build_pack(name_pak, pack_header, mash_header, directory, len(buffer_bytes))
 
 
-fileList = [
-    f for f in listdir(dirname(__file__)) if isfile(join(dirname(__file__), f))
-]
-
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        main(sys.argv[1])
-    else:
-        for file in fileList:
-            main(file)
+    main()

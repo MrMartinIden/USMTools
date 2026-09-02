@@ -1,6 +1,6 @@
 import io
 from ctypes import *
-from string_hash import *
+from .string_hash import *
 
 
 def tohex(val, nbits):

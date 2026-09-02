@@ -17,3 +17,7 @@ To re-importing the extracted resource files into `*.PCPACK`, you need run scrip
 You can also do not indicate the pcpack file, then the script will collect all neighboring files and try to parse them. It's works for `extract_pcpack.py` and `build_pcpack.py`.
 
 Generating readable resource file names requires a file `string_hash_dictionary.txt` from the game.
+
+#### Links
+
+- Tools for Spider-Man: Web of Shadows: https://github.com/kirbystealer/WebOfShadowsTools

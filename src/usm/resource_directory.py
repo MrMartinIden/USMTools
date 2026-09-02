@@ -1,5 +1,5 @@
 from ctypes import *
-from mashable_vector import *
+from .mashable_vector import *
 
 TLRESOURCE_TYPE_NONE = 0
 TLRESOURCE_TYPE_TEXTURE = 1
