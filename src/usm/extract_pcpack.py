@@ -1,14 +1,13 @@
 import argparse
-import io
 import os
 import pathlib
 import sys
-from os import listdir
-from os.path import isfile, join, dirname, splitext
 from ctypes import *
+from os.path import splitext
 
 from .generic_mash_data_ptrs import *
 from .read_pcpack import *
+
 
 class resource_pack_location(Structure):
     _fields_ = [("loc", resource_location),
@@ -75,7 +74,7 @@ def list_pack(file: str):
         resource_file.write(resource_data)
         resource_file.close()
 
-        print("range: {0:#X} {1:#x}".format(resource_idx, resource_idx + mash_data_size))
+        print(f"range: {resource_idx:#X} {resource_idx + mash_data_size:#x}")
 
 
 def extract_pack(file: str):
@@ -110,7 +109,7 @@ def extract_pack(file: str):
         resource_file.write(resource_data)
         resource_file.close()
 
-        print("range: {0:#X} {1:#x}".format(resource_idx, resource_idx + mash_data_size))
+        print(f"range: {resource_idx:#X} {resource_idx + mash_data_size:#x}")
 
 
 def main():

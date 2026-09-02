@@ -1,5 +1,6 @@
 from ctypes import *
 
+
 class generic_mash_header(Structure):
     _fields_ = [("safety_key", c_int),
                 ("field_4", c_int),

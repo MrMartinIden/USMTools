@@ -1,17 +1,16 @@
-import io
-import sys
 import os
+import sys
 
 sys.path.append(os.path.join(sys.path[0], 'src'))
 from usm.generic_mash_header import *
-from usm.resource_pack_header import *
 from usm.mashable_vector import *
 from usm.resource_directory import *
+from usm.resource_pack_header import *
 
 
 def read_pack(file):
     print("Resource pack:", file)
-    with io.open(file, mode="rb") as rPack:
+    with open(file, mode="rb") as rPack:
         buffer_bytes = rPack.read()
         print("0x%02X" % buffer_bytes[0])
         print("0x%02X" % buffer_bytes[1])

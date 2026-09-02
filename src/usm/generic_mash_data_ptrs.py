@@ -1,6 +1,7 @@
 from ctypes import *
 
-class generic_mash_data_ptrs():
+
+class generic_mash_data_ptrs:
 
     def __init__(self, arg0, arg1):
         self.field_0 = arg0

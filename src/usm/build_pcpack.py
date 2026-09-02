@@ -1,16 +1,13 @@
 import argparse
-import sys
 import os
-import pathlib
-from os import listdir
-from os.path import isfile, join, dirname, splitext
+import sys
 from itertools import repeat
-
-from .read_pcpack import *
+from os.path import splitext
 
 from .generic_mash_header import *
-from .resource_pack_header import *
+from .read_pcpack import *
 from .resource_directory import *
+from .resource_pack_header import *
 
 
 def rebase(x, i, f):
@@ -126,13 +123,13 @@ def build_pack(name, pack_header: resource_pack_header,
         f: file
         try:
             f = open(filepath, mode="rb")
-        except IOError:
+        except OSError:
             print ("File does not appear to exist. %s" % filepath)
 
         resource_file.seek(resource_idx, 0)
         resource_file.write(f.read())
 
-        print("range: {0:#X} {1:#x}".format(resource_idx, resource_idx + mash_data_size))
+        print(f"range: {resource_idx:#X} {resource_idx + mash_data_size:#x}")
 
     resource_file.seek(0, 2)
     if resource_file.tell() < size_origin_file:

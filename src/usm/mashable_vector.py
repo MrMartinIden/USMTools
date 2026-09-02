@@ -4,6 +4,7 @@ from .generic_mash_data_ptrs import *
 from .resource_location import *
 from .tlresource_location import *
 
+
 class mashable_vector(Structure):
     _fields_ = [("m_data", c_uint32),
                ("m_size", c_short),

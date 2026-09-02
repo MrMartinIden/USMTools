@@ -1,9 +1,7 @@
-import io
-import shutil
 import os
-from os import listdir
-from os.path import isfile, join, dirname, splitext
 from ctypes import *
+from os import listdir
+from os.path import dirname, isfile, join, splitext
 
 fileList = [ 
     f for f in listdir(dirname(__file__)) if isfile(join(dirname(__file__), f))
@@ -70,7 +68,7 @@ for file in fileList:
     _, ext = splitext(file)
     if ext == ".PAK":
         print("Resource pack:", file)
-        with io.open(file, mode="rb") as rPack:
+        with open(file, mode="rb") as rPack:
             rPack.seek(0, 2)
             numOfBytes = rPack.tell()
             print("Total Size:", numOfBytes, "bytes")

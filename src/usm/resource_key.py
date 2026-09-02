@@ -1,5 +1,5 @@
-import io
 from ctypes import *
+
 from .string_hash import *
 
 
@@ -9,7 +9,7 @@ def tohex(val, nbits):
 
 string_hash_dictionary = {}
 try:
-    with io.open("string_hash_dictionary.txt", mode="r") as dictionary_file:
+    with open("string_hash_dictionary.txt", mode="r") as dictionary_file:
         for i, line in enumerate(dictionary_file):
             if i > 1:
 
@@ -25,7 +25,7 @@ try:
         keys = string_hash_dictionary.keys()
         #print(type(keys))
 
-except IOError:
+except OSError:
     input("Could not open file!")
 
 assert(len(string_hash_dictionary) != 0)
@@ -41,9 +41,9 @@ assert(resource_key_type_ext[48] == ".LANG")
 assert(resource_key_type_ext[49] == ".SLF")
 
 class resource_key(Structure):
-    _fields_ = [("m_hash", string_hash),
-                ("m_type", c_int)
-                ]
+    _fields_ = (("m_hash", string_hash),
+                ("m_type", c_int),
+                )
 
     def is_set(self):
         undefined = string_hash()

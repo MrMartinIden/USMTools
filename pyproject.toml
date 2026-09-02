@@ -3,7 +3,7 @@ name = "usm"
 version = "0.1.0"
 description = "Tools for working with Ultimate Spider-Man"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
@@ -13,3 +13,8 @@ pack = "usm.build_pcpack:main"
 [build-system]
 requires = ["uv_build>=0.12.8,<0.13.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.5",
+]

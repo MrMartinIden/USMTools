@@ -1,7 +1,10 @@
 from ctypes import *
 
+
 class string_hash(Structure):
-    _fields_ = [("source_hash_code", c_int)]
+    _fields_ = (
+            ("source_hash_code", c_int),
+            )
 
     def __init__(self):
         self.source_hash_code = 0
@@ -19,8 +22,8 @@ class string_hash(Structure):
         return self.source_hash_code > other.source_hash_code
 
     def to_string(self) -> str:
-        return "{:#X}".format(self.source_hash_code)
+        return f"{self.source_hash_code:#X}"
 
     def __repr__(self):
-        hash_code = "0x%08X" % self.source_hash_code
+        hash_code = f"{self.source_hash_code:#X}"
         return f'string_hash(name = {hash_code}'

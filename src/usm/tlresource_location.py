@@ -1,11 +1,13 @@
 from ctypes import *
+
 from .string_hash import *
 
+
 class tlresource_location(Structure):
-    _fields_ = [("name", string_hash),
+    _fields_ = (("name", string_hash),
                 ("type", c_char),
-                ("offset", c_int)
-                ]
+                ("offset", c_int),
+                )
 
     def get_type(self) -> int:
         return int.from_bytes(self.type, "little")
