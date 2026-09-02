@@ -1,25 +1,25 @@
-import io
 import os
 import sys
-from os import listdir
-from os.path import isfile, join, dirname, splitext
 from ctypes import *
 from enum import IntEnum
+from os import listdir
+from os.path import dirname, isfile, join, splitext
 
 sys.path.append(os.path.join(sys.path[0], 'src'))
 from generic_mash_data_ptrs import *
 from read_pcpack import *
 
+
 class vector4d(Structure):
-    _fields_ = [
+    _fields_ = (
                 ("arr", c_float * 4),
-                ]
+                )
 
 assert(sizeof(vector4d) == 16)
 
 
 class resource_pack_location(Structure):
-    _fields_ = [("loc", resource_location),
+    _fields_ = (("loc", resource_location),
                 ("field_10", c_int),
                 ("field_14", c_int),
                 ("field_18", c_int),
@@ -28,8 +28,8 @@ class resource_pack_location(Structure):
                 ("prerequisite_count", c_int),
                 ("field_28", c_int),
                 ("field_2C", c_int),
-                ("m_name", c_char * 32)
-                ]
+                ("m_name", c_char * 32),
+                )
 
 assert(sizeof(resource_pack_location) == 0x50)
 
@@ -39,40 +39,40 @@ class TypeDirectoryEntry(IntEnum):
 
 
 class nglDirectoryEntry(Structure):
-    _fields_ = [("field_0", c_char),
+    _fields_ = (("field_0", c_char),
                 ("field_1", c_char),
                 ("field_2", c_char),
                 ("typeDirectoryEntry", c_char),
                 ("field_4", c_int), # <--- this is pointer to the resource (texture, mesh)
                 ("field_8", c_int),
-                ]
+                )
 
 assert(sizeof(nglDirectoryEntry) == 0xC)
 
 class Lod(Structure):
-    _fields_ = [
+    _fields_ = ( 
                 ("field_0", c_int),
                 ("field_4", c_float),
-                ]
+                )
 
 assert(sizeof(Lod) == 0x8)
 
 class tlHashString(Structure):
-    _fields_ = [
+    _fields_ = ( 
                 ("field_0", c_int),
-                ]
+                )
 
 assert(sizeof(tlHashString) == 4)
 
 class nglVertexBuffer(Structure):
-    _fields_ = [
+    _fields_ = ( 
                 ("m_vertexData", c_int),
                 ("Size", c_int), # <---- size of vertex data in bytes
-                ("m_vertexBuffer", c_int)
-            ]
+                ("m_vertexBuffer", c_int),
+                )
 
 class nglMeshSection(Structure):
-    _fields_ = [
+    _fields_ = (
                 ("Name", c_int), # <----- tlFixedString
                 ("Material", c_int), # <----- nglMaterialBase
                 ("NBones", c_int),
@@ -91,17 +91,17 @@ class nglMeshSection(Structure):
                 ("field_50", c_int),
                 ("VertexDef", c_int),
                 ("field_58", c_int),
-                ("field_5C", c_int)
-                ]
+                ("field_5C", c_int),
+                )
 
 class Section(Structure):
-    _fields_ = [
+    _fields_ = (
                 ("field_0", c_int),
                 ("Section", c_int), # <---- nglMeshSection
-                ]
+                )
 
 class nglMesh(Structure):
-    _fields_ = [
+    _fields_ = (
                 ("Name", c_int), # <----- tlFixedString
                 ("Flags", c_int),
                 ("NSections", c_int),
@@ -114,47 +114,47 @@ class nglMesh(Structure):
                 ("SphereRadius", c_int),
                 ("File", c_int),
                 ("NextMesh", c_int),
-                ("field_3C", c_int)
-                ]
+                ("field_3C", c_int),
+                )
 
 assert(sizeof(nglMesh) == 0x40)
 
 class nglMeshFileHeader(Structure):
-    _fields_ = [
+    _fields_ = (
                 ("Tag", c_char * 4),
                 ("Version", c_int),
                 ("NDirectoryEntries", c_int),
                 ("DirectoryEntries", c_int),
-                ("field_10", c_int)
-                ]
+                ("field_10", c_int),
+                )
 
 assert(sizeof(nglMeshFileHeader) == 0x14)
 
 class tlFixedString(Structure):
-    _fields_ = [
+    _fields_ = (
                 ("m_hash", c_int),
                 ("field_4", c_char * 28)
-                ]
+                )
 
 assert(sizeof(tlFixedString) == 0x20)
 
 
 class nglShader(Structure):
-    _fields_ = [
+    _fields_ = (
                 ("m_vtbl", c_int),
                 ("field_4", c_int),
                 ("field_8", c_int),
-                ]
+                )
 
 assert(sizeof(nglShader) == 0xC)
 
 class nglTexture(Structure):
-    _fields_ = [
+    _fields_ = (
                 ("field_0", c_int),
-                ]
+                )
 
 class nglMaterialBase(Structure):
-    _fields_ = [("Name", c_int),
+    _fields_ = (("Name", c_int),
                 ("field_4", c_uint32), # <----- nglShader
                 ("File", c_int),
                 ("NextMaterial", c_int),
@@ -171,7 +171,7 @@ class nglMaterialBase(Structure):
                 ("field_44", c_int),
                 ("m_outlineFeature", c_int),
                 ("m_blend_mode", c_int),
-                ]
+                )
 
 assert(sizeof(nglMaterialBase) == 0x50)
 
@@ -236,7 +236,7 @@ def read_mesh(Mesh: nglMesh, buffer_bytes):
     ndisplay = nameMesh.field_4.decode("utf-8")
     filepath = os.path.join('.', 'tmp', ndisplay + ".obj")
     filepath = ''.join(x for x in filepath if x.isprintable())
-    resource_file = open(filepath, mode="w")
+    resource_file = io.open(filepath, mode="w")
 
     #resource_file.write("MeshName = %s, NSections = %d\n" % (nameMesh.field_4, Mesh.NSections))
     offset = Mesh.Sections
@@ -270,13 +270,13 @@ def read_mesh(Mesh: nglMesh, buffer_bytes):
         #resource_file.write("NPrimitive = %d\n" % primCount)
 
         class VertexData(Structure):
-            _fields_ = [
+            _fields_ = (
                         ("pos", c_float * 3),
                         ("normal", c_float * 3),
                         ("uv", c_float * 2),
                         ("bone_indices", c_float * 4),
                         ("bone_weights", c_float * 4)
-                        ]
+                        )
 
             def __repr__(self):
                 return f'VertexData: pos = {list(self.pos)}, normal = {list(self.normal)}, uv = {list(self.uv)}, bone_indices = {list(self.bone_indices)}, bone_weights = {list(self.bone_weights)}'
@@ -346,7 +346,7 @@ def read_mesh(Mesh: nglMesh, buffer_bytes):
 
 def read_meshfile(file):
     print("Resource pack:", file)
-    with io.open(file, mode="rb") as rPack:
+    with open(file, mode="rb") as rPack:
         buffer_bytes = rPack.read()
 
         print("0x%02X" % buffer_bytes[0])

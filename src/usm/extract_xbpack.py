@@ -1,9 +1,7 @@
-import io
-import shutil
 import os
-from os import listdir
-from os.path import isfile, join, dirname, splitext
 from ctypes import *
+from os import listdir
+from os.path import dirname, isfile, join, splitext
 
 fileList = [ 
     f for f in listdir(dirname(__file__)) if isfile(join(dirname(__file__), f))
@@ -61,7 +59,7 @@ class string_hash(Structure):
         return self.source_hash_code > other.source_hash_code
 
     def to_string(self) -> str:
-        return "{:#X}".format(self.source_hash_code)
+        return f"{self.source_hash_code:#X}"
 
     def __repr__(self):
         hash_code = "0x%08X" % self.source_hash_code
@@ -70,14 +68,14 @@ class string_hash(Structure):
 
 string_hash_dictionary = {}
 try:
-    with io.open("string_hash_dictionary.txt", mode="r") as dictionary_file:
+    with open("string_hash_dictionary.txt", mode="r") as dictionary_file:
         for i, line in enumerate(dictionary_file):
             if i > 1:
                 arr = line.split()
                 h = int(arr[0], 16)
                 string_hash_dictionary[h] = arr[1]
         
-except IOError:
+except OSError:
     input("Could not open file!")
 
 assert(len(string_hash_dictionary) != 0)
@@ -471,7 +469,7 @@ for file in fileList:
     if ext == ".XBPACK":
     
         print("Resource pack:", file)
-        with io.open(file, mode="rb") as rPack:
+        with open(file, mode="rb") as rPack:
         
             buffer_bytes = rPack.read()
             print("0x%02X" % buffer_bytes[0])

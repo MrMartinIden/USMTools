@@ -1,4 +1,5 @@
 from ctypes import *
+
 from .mashable_vector import *
 
 TLRESOURCE_TYPE_NONE = 0
@@ -22,7 +23,7 @@ RESOURCE_KEY_TYPE_MATERIAL_FILE_STRUCT = 53
 RESOURCE_KEY_TYPE_Z = 70
 
 class resource_directory(Structure):
-    _fields_ = [("parents", mashable_vector),
+    _fields_ = (("parents", mashable_vector),
                 ("resource_locations", mashable_vector__resource_location),
                 ("texture_locations", mashable_vector__tlresource_location),
                 ("mesh_file_locations", mashable_vector__tlresource_location),
@@ -43,8 +44,8 @@ class resource_directory(Structure):
                 ("field_84", c_int),
                 ("field_88", c_int),
                 ("type_start_idxs", c_int * 70),
-                ("type_end_idxs", c_int * 70)
-                ]
+                ("type_end_idxs", c_int * 70),
+                )
 
     def __repr__(self):
         return f'resource_directory:\n\tparents = {self.parents},\n\tresource_locations = {self.resource_locations},\n\t' \
