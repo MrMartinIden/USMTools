@@ -1,70 +1,15 @@
 import os
 from ctypes import *
-from os import listdir
-from os.path import dirname, isfile, join, splitext
+from os.path import splitext
+from typing import ClassVar
 
-fileList = [ 
-    f for f in listdir(dirname(__file__)) if isfile(join(dirname(__file__), f))
-]
+from usm.generic_mash_header import *
+from usm.pack_file import PACKFile
+from usm.resource_pack_header import *
+from usm.string_hash import *
+from usm.tlresource_location import *
 
-class resource_versions(Structure):
-    _fields_ = [("field_0", c_int),
-                ("field_4", c_int),
-                ("field_8", c_int),
-                ("field_C", c_int),
-                ("field_10", c_int)]
-                
-assert(sizeof(resource_versions) == 0x14)
-                
-class resource_amalgapak_header(Structure):
-    _fields_ = [("field_0", resource_versions),
-                ("field_14", c_int),
-                ("field_18", c_int),
-                ("header_size", c_int),
-                ("location_table_size", c_int),
-                ("field_24", c_int),
-                ("memory_map_table_size", c_int),
-                ("field_2C", c_int),
-                ("prerequisite_table_size", c_int),
-                ("field_34", c_int)]
-                
-class resource_pack_header(Structure):
-    _fields_ = [("field_0", resource_versions),
-                ("field_14", c_int),
-                ("directory_offset", c_int),
-                ("res_dir_mash_size", c_int),
-                ("field_20", c_int),
-                ("field_24", c_int),
-                ("field_28", c_int)
-                ]
-
-assert(sizeof(resource_pack_header) == 0x2C)
-
-class string_hash(Structure):
-    _fields_ = [("source_hash_code", c_int)]
-
-    def __init__(self):
-        self.source_hash_code = 0
-
-    def __eq__(self, a2):
-        return self.source_hash_code != a2.source_hash_code;
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __lt__(self, other):
-        return self.source_hash_code < other.source_hash_code
-        
-    def __gt__(self, other):
-        return self.source_hash_code > other.source_hash_code
-
-    def to_string(self) -> str:
-        return f"{self.source_hash_code:#X}"
-
-    def __repr__(self):
-        hash_code = "0x%08X" % self.source_hash_code
-        return f'string_hash(name = {hash_code}'    
-
+from .pack import PackParser
 
 string_hash_dictionary = {}
 try:
@@ -93,7 +38,7 @@ resource_key_type_ext = ["none",
                         ".CSV", "._ENTID_", "._ANIMID_", "._REGIONID_", "._AI_GENERIC_ID_", "._RADIOMSG_", "._GOAL_", "._IFC_ATTRIBUTE_", "._SIGNAL_", "._PACKSTATE_"]
 
 class resource_key(Structure):
-    _fields_ = [("m_hash", string_hash),
+    _fields_: ClassVar = [("m_hash", string_hash),
                 ("m_type", c_int)
                 ]
                 
@@ -117,7 +62,7 @@ class resource_key(Structure):
         return f'resource_key(m_hash = {self.m_hash}, m_type = {self.m_type})'
 
 class resource_location(Structure):
-    _fields_ = [("field_0", resource_key),
+    _fields_: ClassVar = [("field_0", resource_key),
                 ("m_offset", c_int),
                 ("m_size", c_int)
                 ]
@@ -141,60 +86,9 @@ TLRESOURCE_TYPE_SCENE_ANIM = 10
 TLRESOURCE_TYPE_SKELETON = 11
 TLRESOURCE_TYPE_Z = 12
 
-class tlresource_location(Structure):
-    _fields_ = [("name", string_hash),
-                ("type", c_char),
-                ("offset", c_int)
-                ]
-                
-    def get_type(self) -> int:
-        return int.from_bytes(self.type, "little")
-
-    def __repr__(self):
-        return f'tlresource_location(name = {self.name}, type = {self.get_type()}, offset={hex(self.offset)})'
-                
-assert(sizeof(tlresource_location) == 0xC)
-
-
-class resource_pack_location(Structure):
-    _fields_ = [("loc", resource_location),
-                ("field_10", c_int),
-                ("field_14", c_int),
-                ("field_18", c_int),
-                ("field_1C", c_int),
-                ("prerequisite_offset", c_int),
-                ("prerequisite_count", c_int),
-                ("field_28", c_int),
-                ("field_2C", c_int),
-                ("m_name", c_char * 32)
-                ]
-                
-assert(sizeof(resource_pack_location) == 0x50)
-
-class generic_mash_header(Structure):
-    _fields_ = [("safety_key", c_int),
-                ("field_4", c_int),
-                ("field_8", c_int),
-                ("class_id", c_short),
-                ("field_E", c_short)
-                ]
-                
-    def __repr__(self):
-        return f'generic_mash_header(safety_key = {hex(self.safety_key)}, field_4={self.field_4}, field_8={hex(self.field_8)})'
-                
-    def generate_safety_key(self):
-        return (self.field_8 + 0x7BADBA5D - (self.field_4 & 0xFFFFFFF) + self.class_id + self.field_E) & 0xFFFFFFF | 0x70000000
-        
-    def is_flagged(self, f: c_int):
-        return (f & self.field_4) != 0
-        
-    def get_mash_data(self) -> c_char_p:
-        return cast(this, c_char_p) + self.field_8
-
-assert(sizeof(generic_mash_header) == 0x10)
 
 class generic_mash_data_ptrs(Structure):
-    _fields_ = [("field_0", c_int),
+    _fields_: ClassVar = [("field_0", c_int),
                 ("field_4", c_int)
                 ]
              
@@ -208,7 +102,7 @@ class generic_mash_data_ptrs(Structure):
     
 
 class mashable_vector(Structure):
-    _fields_ = [("m_data", c_int),
+    _fields_: ClassVar = [("m_data", c_int),
                ("m_size", c_short),
                ("m_shared", c_bool),
                ("field_7", c_bool)
@@ -278,7 +172,7 @@ RESOURCE_KEY_TYPE_MATERIAL_FILE_STRUCT = 53
 RESOURCE_KEY_TYPE_Z = 70
 
 class resource_directory(Structure):
-    _fields_ = [("parents", mashable_vector),
+    _fields_: ClassVar = [("parents", mashable_vector),
                 ("resource_locations", mashable_vector),
                 ("texture_locations", mashable_vector),
                 ("mesh_file_locations", mashable_vector),
@@ -359,35 +253,35 @@ class resource_directory(Structure):
     def tlresource_type_to_vector(self, a2: int):
         match a2:
             case 1:
-                return self.texture_locations;
+                return self.texture_locations
             case 2:
-                return self.mesh_file_locations;
+                return self.mesh_file_locations
             case 3:
-                return self.mesh_locations;
+                return self.mesh_locations
             case 4:
-                return self.morph_file_locations;
+                return self.morph_file_locations
             case 5:
-                return self.morph_locations;
+                return self.morph_locations
             case 6:
-                return self.material_file_locations;
+                return self.material_file_locations
             case 7:
-                return self.material_locations;
+                return self.material_locations
             case 8:
-                return self.anim_file_locations;
+                return self.anim_file_locations
             case 9:
-                return self.anim_locations;
+                return self.anim_locations
             case 10:
-                return self.scene_anim_locations;
+                return self.scene_anim_locations
             case 11:
-                return self.skeleton_locations;
+                return self.skeleton_locations
             case 13:
-                return self.texture_locations;
+                return self.texture_locations
             case 14:
-                return self.texture_locations;
+                return self.texture_locations
             case 15:
-                return self.texture_locations;
+                return self.texture_locations
             case _:
-                assert(0 and "invalid tlresource type");
+                assert 0, "invalid tlresource type"
 
     def get_resource_count(self, p_type: int):
         assert(p_type > RESOURCE_KEY_TYPE_NONE and p_type < RESOURCE_KEY_TYPE_Z)
@@ -464,22 +358,20 @@ assert(sizeof(resource_directory) == 0x2C4)
 
 DEV_MODE = 1
 
-for file in fileList:
-    name_pak, ext = splitext(file)
-    if ext == ".XBPACK":
-    
+class XBPackParser(PackParser):
+    def read(self, file: str) -> PACKFile:
         print("Resource pack:", file)
         with open(file, mode="rb") as rPack:
-        
+
             buffer_bytes = rPack.read()
-            print("0x%02X" % buffer_bytes[0])
-            print("0x%02X" % buffer_bytes[1])
+            print(f"0x{buffer_bytes[0]:02X}")
+            print(f"0x{buffer_bytes[1]:02X}")
             print(len(buffer_bytes))
-            
+
             rPack.seek(0, 2)
             numOfBytes = rPack.tell()
             print("Total Size:", numOfBytes, "bytes")
-            
+
             pack_header = resource_pack_header.from_buffer_copy(buffer_bytes[0:sizeof(resource_pack_header)])
 
             rpVersion = pack_header.field_0.field_0
@@ -496,10 +388,10 @@ for file in fileList:
             print(mash_header)
 
             cur_ptr = directory_offset + sizeof(generic_mash_header)
-            
+
             directory = resource_directory.from_buffer_copy(buffer_bytes[cur_ptr : cur_ptr + sizeof(resource_directory)])
             print(directory)
-            
+
             assert(directory.parents.from_mash())
             assert(directory.resource_locations.from_mash())
             assert(directory.texture_locations.from_mash())
@@ -507,69 +399,96 @@ for file in fileList:
             assert(directory.mesh_locations.from_mash())
             assert(directory.morph_file_locations.from_mash())
             assert(directory.morph_locations.from_mash())
-            
+
             v16 = cur_ptr + sizeof(resource_directory)
-            
+
             mash_data_ptrs = generic_mash_data_ptrs()
             mash_data_ptrs.field_0 = v16
             mash_data_ptrs.field_4 = directory_offset + mash_header.field_8
             print(mash_data_ptrs)
 
             assert(directory_offset % 4 == 0)
-    
+
             directory.un_mash_start(mash_data_ptrs, buffer_bytes)
-            
+
             directory.constructor_common(pack_header.res_dir_mash_size, 0, pack_header.field_20 - pack_header.res_dir_mash_size, pack_header.field_24)
-            
+
             assert(directory.get_tlresource_count( TLRESOURCE_TYPE_MESH_FILE ) == directory.get_resource_count( RESOURCE_KEY_TYPE_MESH_FILE_STRUCT ))
-            
+
             assert(directory.get_tlresource_count( TLRESOURCE_TYPE_MATERIAL_FILE ) == directory.get_resource_count( RESOURCE_KEY_TYPE_MATERIAL_FILE_STRUCT ))
 
             if DEV_MODE == 1:
                 print("\nDeveloper info:\n")
-                
+
                 versions = pack_header.field_0
                 print("RESOURCE_PACK_VERSION", versions.field_0)
                 print("RESOURCE_ENTITY_MASH_VERSION", versions.field_4)
                 print("RESOURCE_NOENTITY_MASH_VERSION", versions.field_8)
                 print("RESOURCE_AUTO_MASH_VERSION", versions.field_C)
                 print("RESOURCE_RAW_MASH_VERSION", versions.field_10)
-                
+
                 print("directory_offset", hex(directory_offset))
-                print("base = 0x%04X" % base)
-                
+                print(f"base = 0x{base:04X}")
+
                 print("mash_header", hex(mash_header.field_8))
-            
-           
-            folder = name_pak
-            try:
-                os.mkdir(folder)
-            except OSError:
-                print ("Creation of the directory %s failed" % folder)
-            else:
-                print ("Successfully created the directory %s " % folder)
-                
+
+            resources = {}
             for i in range(directory.resource_locations.size()):
-                
                 res_loc: resource_location = directory.get_resource_location(i, buffer_bytes)
                 #print(res_loc)
-                
+
                 mash_data_size = res_loc.m_size
                 resource_idx = directory.get_resource(res_loc)
-                
-                ndisplay = res_loc.field_0.get_platform_string()
-                filepath = os.path.join(folder, ndisplay)
-                filepath = ''.join(x for x in filepath if x.isprintable())
-                resource_file = open(filepath, mode="wb")
-                
-                resource_data = buffer_bytes[resource_idx : resource_idx + mash_data_size]
-                resource_file.write(resource_data)
-                resource_file.close()
-                
-                #print("{0:d} {1:#x}".format(mash_data_size, resource_idx))
-           
-           
-            print("\n")
-            
+                name = ''.join(x for x in res_loc.field_0.get_platform_string() if x.isprintable())
 
-print("\nDone.")
+                resources[name] = buffer_bytes[resource_idx : resource_idx + mash_data_size]
+
+            print("\n")
+
+            return PACKFile(pack_header, mash_header, directory, numOfBytes, resources)
+
+    def extract(self, file: str) -> None:
+        name_pak, _ = splitext(file)
+
+        pack = self.read(file)
+
+        folder = name_pak
+        try:
+            os.mkdir(folder)
+        except OSError:
+            print(f"Creation of the directory {folder} failed")
+        else:
+            print(f"Successfully created the directory {folder} ")
+
+        for name, data in pack.resources.items():
+            filepath = os.path.join(folder, name)
+            with open(filepath, mode="wb") as resource_file:
+                resource_file.write(data)
+
+    def build(self, name: str, pack: PACKFile) -> None:
+        directory = pack.directory
+        folder = name
+
+        with open(name + ".XBPACK", mode="rb") as rPack:
+            buffer_bytes = bytearray(rPack.read())
+
+        for i in range(directory.resource_locations.size()):
+            res_loc: resource_location = directory.get_resource_location(i, buffer_bytes)
+
+            resource_idx = directory.get_resource(res_loc)
+            mash_data_size = res_loc.m_size
+
+            ndisplay = ''.join(x for x in res_loc.field_0.get_platform_string() if x.isprintable())
+            filepath = os.path.join(folder, ndisplay)
+
+            try:
+                with open(filepath, mode="rb") as f:
+                    data = f.read()
+            except OSError:
+                print(f"File does not appear to exist. {filepath}")
+                continue
+
+            buffer_bytes[resource_idx:resource_idx + mash_data_size] = data
+
+        with open(name + "._XBPACK", mode="wb") as resource_file:
+            resource_file.write(buffer_bytes)

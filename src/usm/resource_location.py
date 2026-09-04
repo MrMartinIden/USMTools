@@ -6,7 +6,7 @@ from .resource_key import *
 class resource_location(Structure):
     _fields_ = (("field_0", resource_key),
                 ("m_offset", c_int),
-                ("m_size", c_int)
+                ("m_size", c_int),
                 )
 
     def __repr__(self):

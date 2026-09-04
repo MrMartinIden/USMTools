@@ -54,7 +54,8 @@ class resource_directory(Structure):
                f'morph_file_locations = {self.morph_file_locations},\n\tmorph_locations = {self.morph_locations},\n\t' \
                f'material_file_locations = {self.material_file_locations},\n\tmaterial_locations = {self.material_locations},\n\t' \
                f'anim_file_locations = {self.anim_file_locations},\n\tanim_locations = {self.anim_locations},\n\t' \
-               f'scene_anim_locations = {self.scene_anim_locations},\n\tskeleton_locations = {self.skeleton_locations}\n )'
+               f'scene_anim_locations = {self.scene_anim_locations},\n\tskeleton_locations = {self.skeleton_locations}\n\t' \
+               f'base = {self.base} )'
 
 
     def constructor_common(self, a3: int, a5: int, a6: int, a7: int):
@@ -104,35 +105,35 @@ class resource_directory(Structure):
     def tlresource_type_to_vector(self, a2: int):
         match a2:
             case 1:
-                return self.texture_locations;
+                return self.texture_locations
             case 2:
-                return self.mesh_file_locations;
+                return self.mesh_file_locations
             case 3:
-                return self.mesh_locations;
+                return self.mesh_locations
             case 4:
-                return self.morph_file_locations;
+                return self.morph_file_locations
             case 5:
-                return self.morph_locations;
+                return self.morph_locations
             case 6:
-                return self.material_file_locations;
+                return self.material_file_locations
             case 7:
-                return self.material_locations;
+                return self.material_locations
             case 8:
-                return self.anim_file_locations;
+                return self.anim_file_locations
             case 9:
-                return self.anim_locations;
+                return self.anim_locations
             case 10:
-                return self.scene_anim_locations;
+                return self.scene_anim_locations
             case 11:
-                return self.skeleton_locations;
+                return self.skeleton_locations
             case 13:
-                return self.texture_locations;
+                return self.texture_locations
             case 14:
-                return self.texture_locations;
+                return self.texture_locations
             case 15:
-                return self.texture_locations;
+                return self.texture_locations
             case _:
-                assert(0 and "invalid tlresource type");
+                assert 0, "invalid tlresource type"
 
     def get_resource_count(self, p_type: int):
         assert(p_type > RESOURCE_KEY_TYPE_NONE and p_type < RESOURCE_KEY_TYPE_Z)

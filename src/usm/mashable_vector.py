@@ -6,11 +6,11 @@ from .tlresource_location import *
 
 
 class mashable_vector(Structure):
-    _fields_ = [("m_data", c_uint32),
+    _fields_ = (("m_data", c_uint32),
                ("m_size", c_short),
                ("m_shared", c_bool),
-               ("field_7", c_bool)
-                ]
+               ("field_7", c_bool),
+                )
 
     def __repr__(self):
         return f'mashable_vector(m_size={self.m_size}, m_shared={self.m_shared}, ' \
@@ -43,11 +43,11 @@ class mashable_vector(Structure):
         return self.custom_un_mash(a4)
 
 class mashable_vector__resource_location(Structure):
-    _fields_ = [("m_data", c_uint32),
+    _fields_ = (("m_data", c_uint32),
                ("m_size", c_short),
                ("m_shared", c_bool),
-               ("field_7", c_bool)
-                ]
+               ("field_7", c_bool),
+                )
 
     def __repr__(self):
         return f'mashable_vector(m_size={self.m_size}, m_shared={self.m_shared}, ' \
@@ -69,7 +69,7 @@ class mashable_vector__resource_location(Structure):
         a4.rebase(4)
 
         offset = int(a4.field_0.tell())
-        print("0x%08X" % offset)
+        print(f"0x{offset:08X}")
 
         array_data = a4.get(resource_location, int(self.m_size))
         m_data_ptr = cast(array_data, POINTER(resource_location))
@@ -80,11 +80,11 @@ class mashable_vector__resource_location(Structure):
 
 
 class mashable_vector__tlresource_location(Structure):
-    _fields_ = [("m_data", c_uint32),
+    _fields_ = (("m_data", c_uint32),
                ("m_size", c_short),
                ("m_shared", c_bool),
-               ("field_7", c_bool)
-                ]
+               ("field_7", c_bool),
+                )
 
     def __repr__(self):
         return f'mashable_vector(m_size={self.m_size}, m_shared={self.m_shared}, ' \
@@ -106,7 +106,7 @@ class mashable_vector__tlresource_location(Structure):
         a4.rebase(4)
 
         offset = int(a4.field_0.tell())
-        print("0x%08X" % offset)
+        print(f"0x{offset:08X}")
 
         array_data = a4.get(tlresource_location, int(self.m_size))
         m_data_ptr = cast(array_data, POINTER(tlresource_location))

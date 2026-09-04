@@ -3,60 +3,16 @@ from ctypes import *
 from os import listdir
 from os.path import dirname, isfile, join, splitext
 
-fileList = [ 
+from .resource_amalgapak_header import *
+from .resource_key import *
+from .resource_location import *
+from .resource_pack_location import *
+from .resource_versions import *
+from .string_hash import *
+
+fileList = [
     f for f in listdir(dirname(__file__)) if isfile(join(dirname(__file__), f))
 ]
-
-class resource_versions(Structure):
-    _fields_ = [("field_0", c_int),
-                ("field_4", c_int),
-                ("field_8", c_int),
-                ("field_C", c_int),
-                ("field_10", c_int)]
-                
-class resource_amalgapak_header(Structure):
-    _fields_ = [("field_0", resource_versions),
-                ("field_14", c_int),
-                ("field_18", c_int),
-                ("header_size", c_int),
-                ("location_table_size", c_int),
-                ("field_24", c_int),
-                ("memory_map_table_size", c_int),
-                ("field_2C", c_int),
-                ("prerequisite_table_size", c_int),
-                ("field_34", c_int)]
-
-assert(sizeof(resource_versions) == 0x14)
-
-class string_hash(Structure):
-    _fields_ = [("field_0", c_int)]
-
-class resource_key(Structure):
-    _fields_ = [("m_hash", string_hash),
-                ("m_type", c_int)
-                ]
-
-class resource_location(Structure):
-    _fields_ = [("field_0", resource_key),
-                ("field_8", c_int),
-                ("m_size", c_int)
-                ]
-
-
-class resource_pack_location(Structure):
-    _fields_ = [("loc", resource_location),
-                ("field_10", c_int),
-                ("field_14", c_int),
-                ("field_18", c_int),
-                ("field_1C", c_int),
-                ("prerequisite_offset", c_int),
-                ("prerequisite_count", c_int),
-                ("field_28", c_int),
-                ("field_2C", c_int),
-                ("m_name", c_char * 32)
-                ]
-                
-assert(sizeof(resource_pack_location) == 0x50)
 
 #Header_Section 0x38
 #LBA_Section 0xBFE0
@@ -119,9 +75,9 @@ for file in fileList:
             try:
                 os.mkdir(folder)
             except OSError:
-                print ("Creation of the directory %s failed" % folder)
+                print (f"Creation of the directory {folder} failed")
             else:
-                print ("Successfully created the directory %s " % folder)
+                print (f"Successfully created the directory {folder} ")
                 
             for fileIndex in range(amalgapak_pack_location_count):
                 pack_loc = amalgapak_pack_location_table[fileIndex]
@@ -139,9 +95,8 @@ for file in fileList:
                 print(filepath, hex(filePos))
                 
                 nfldata = rPack.read(filesize)
-                nflfile = open(filepath, mode="wb")
-                nflfile.write(nfldata)
-                nflfile.close()
+                with open(filepath, mode="wb") as nflfile:
+                    nflfile.write(nfldata)
             
 
 print("\nDone.")

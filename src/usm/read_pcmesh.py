@@ -184,11 +184,9 @@ def write_indices(resource_file, indices, primitive_type, enable_normals: bool):
         #resource_file.write("f " + ("%d %d %d\n" % (face[0], face[1], face[2])))
 
         if enable_normals:
-            resource_file.write("f " + ("%d/%d/%d %d/%d/%d %d/%d/%d\n" % (face[0], face[0], face[0],
-                                                             face[1], face[1], face[1],
-                                                             face[2], face[2], face[2])))
+            resource_file.write("f " + f"{face[0]}/{face[0]}/{face[0]} {face[1]}/{face[1]}/{face[1]} {face[2]}/{face[2]}/{face[2]}\n")
         else:
-            resource_file.write("f " + ("%d/%d %d/%d %d/%d\n" % (face[0], face[0], face[1], face[1], face[2], face[2])))
+            resource_file.write("f " + f"{face[0]}/{face[0]} {face[1]}/{face[1]} {face[2]}/{face[2]}\n")
 
         for idx in list(indices):
             face = [face[1], face[2], idx]
@@ -196,11 +194,9 @@ def write_indices(resource_file, indices, primitive_type, enable_normals: bool):
                 #resource_file.write("f " + ("%d %d %d\n" % (face[0], face[1], face[2])))
 
                 if enable_normals:
-                    resource_file.write("f " + ("%d/%d/%d %d/%d/%d %d/%d/%d\n" % (face[0], face[0], face[0],
-                                                                 face[1], face[1], face[1],
-                                                             face[2], face[2], face[2])))
+                    resource_file.write("f " + f"{face[0]}/{face[0]}/{face[0]} {face[1]}/{face[1]}/{face[1]} {face[2]}/{face[2]}/{face[2]}\n")
                 else:
-                    resource_file.write("f " + ("%d/%d %d/%d %d/%d\n" % (face[0], face[0], face[1], face[1], face[2], face[2])))
+                    resource_file.write("f " + f"{face[0]}/{face[0]} {face[1]}/{face[1]} {face[2]}/{face[2]}\n")
 
 
     elif primitive_type == 4:
@@ -211,11 +207,9 @@ def write_indices(resource_file, indices, primitive_type, enable_normals: bool):
         for face in faces:
 
             if enable_normals:
-                resource_file.write("f " + ("%d/%d/%d %d/%d/%d %d/%d/%d\n" % (face[0], face[0], face[0],
-                                                             face[1], face[1], face[1],
-                                                             face[2], face[2], face[2])))
+                resource_file.write("f " + f"{face[0]}/{face[0]}/{face[0]} {face[1]}/{face[1]}/{face[1]} {face[2]}/{face[2]}/{face[2]}\n")
             else:
-                resource_file.write("f " + ("%d/%d %d/%d %d/%d\n" % (face[0], face[0], face[1], face[1], face[2], face[2])))
+                resource_file.write("f " + f"{face[0]}/{face[0]} {face[1]}/{face[1]} {face[2]}/{face[2]}\n")
 
     else:
         assert(0)
@@ -229,9 +223,9 @@ def read_mesh(Mesh: nglMesh, buffer_bytes):
     try:
         os.mkdir(folder)
     except OSError:
-        print ("Creation of the directory %s failed" % folder)
+        print ("Creation of the directory {folder} failed")
     else:
-        print ("Successfully created the directory %s " % folder)
+        print (f"Successfully created the directory {folder}")
 
     ndisplay = nameMesh.field_4.decode("utf-8")
     filepath = os.path.join('.', 'tmp', ndisplay + ".obj")
@@ -257,12 +251,6 @@ def read_mesh(Mesh: nglMesh, buffer_bytes):
 
         #resource_file.write("\nidx_section = %d, name = %s, primitiveType = %d, stride = %d, NIndices = %d, NVertices = %d, SizeVertexDataInBytes = %d\n"
         #        % (idx, name.field_4, meshSection.m_primitiveType, meshSection.m_stride, meshSection.NIndices, meshSection.NVertices, meshSection.VertexBuffer.Size))
-
-        primCount = 0
-        if meshSection.m_primitiveType == 5:
-            primCount = meshSection.NIndices - 2
-        elif meshSection.m_primitiveType == 4:
-            primCount = meshSection.NIndices / 3
 
         assert(meshSection.m_stride == 64)
         assert(meshSection.m_stride * meshSection.NVertices == meshSection.VertexBuffer.Size)
@@ -290,13 +278,13 @@ def read_mesh(Mesh: nglMesh, buffer_bytes):
 
         for vtx in vertex_data:
             print(vtx)
-            resource_file.write("v " + ("%.6f %.6f %.6f" % (vtx.pos[0], vtx.pos[1], vtx.pos[2])) + '\n')
+            resource_file.write("v " + (f"{vtx.pos[0]:.6f} {vtx.pos[1]:.6f} {vtx.pos[2]:.6f}") + '\n')
 
         for vtx in vertex_data:
-            resource_file.write("vt " + ("%.6f %.6f" % (vtx.uv[0], 1.0 - vtx.uv[1])) + '\n')
+            resource_file.write("vt " + (f"{vtx.uv[0]:.6f} {1.0 - vtx.uv[1]:.6f}") + '\n')
 
         for vtx in vertex_data:
-            resource_file.write("vn " + ("%.6f %.6f %.6f" % (vtx.normal[0], vtx.normal[1], vtx.normal[2])) + '\n')
+            resource_file.write("vn " + (f"{vtx.normal[0]:.6f} {vtx.normal[1]:.6f} {vtx.normal[2]:.6f}") + '\n')
 
         resource_file.write("s off\n")
 
@@ -306,13 +294,13 @@ def read_mesh(Mesh: nglMesh, buffer_bytes):
 
         #resource_file.write("\nIndices: ")
 
-        print("NIndices = %d" % (meshSection.NIndices))
+        print(f"NIndices = {meshSection.NIndices}")
 
         if meshSection.NIndices != 0:
 
             num_vertices = int(meshSection.NVertices)
             max_index = max(list(indices))
-            print("max_index = %d, NVertices = %d" % (max_index, num_vertices))
+            print(f"max_index = {max_index}, NVertices = {num_vertices}")
 
             for i, index in enumerate(indices):
                 indices[i] = prev_NVertices + index + 1
@@ -320,12 +308,11 @@ def read_mesh(Mesh: nglMesh, buffer_bytes):
             write_indices(resource_file, indices, meshSection.m_primitiveType, False)
         elif meshSection.NVertices == 6:
 
-            resource_file.write("f " + ("%d %d %d\n" % (1, 2, 3)))
-            resource_file.write("f " + ("%d %d %d\n" % (4, 5, 6)))
+            resource_file.write("f " + "1 2 3\n")
+            resource_file.write("f " + "4 5 6\n")
         else:
 
-            print("\nidx_section = %d, name = %s, primitiveType = %d, stride = %d, NIndices = %d, NVertices = %d, SizeVertexDataInBytes = %d\n"
-                % (idx, name.field_4, meshSection.m_primitiveType, meshSection.m_stride, meshSection.NIndices, meshSection.NVertices, meshSection.VertexBuffer.Size))
+            print(f"\nidx_section = {idx}, name = {name.field_4}, primitiveType = {meshSection.m_primitiveType}, stride = {meshSection.m_stride}, NIndices = {meshSection.NIndices}, NVertices = {meshSection.NVertices}, SizeVertexDataInBytes = {meshSection.VertexBuffer.Size}\n")
             assert(0)
 
         prev_NVertices = meshSection.NVertices + prev_NVertices
@@ -349,8 +336,8 @@ def read_meshfile(file):
     with open(file, mode="rb") as rPack:
         buffer_bytes = rPack.read()
 
-        print("0x%02X" % buffer_bytes[0])
-        print("0x%02X" % buffer_bytes[1])
+        print(f"0x{buffer_bytes[0]:02X}")
+        print(f"0x{buffer_bytes[1]:02X}")
         print(len(buffer_bytes))
 
         rPack.seek(0, 2)
@@ -364,25 +351,25 @@ def read_meshfile(file):
         assert(Header.field_10 == 0)
 
         for i in range(Header.NDirectoryEntries):
-            print("\nidx = %d" % i)
+            print(f"\nidx = {i}")
 
             offset = Header.DirectoryEntries + i * sizeof(nglDirectoryEntry)
-            print("Offset = 0x%X" % offset);
+            print(f"Offset = 0x{offset:X}");
 
             entry = nglDirectoryEntry.from_buffer_copy(buffer_bytes[offset : (offset + sizeof(nglDirectoryEntry))])
             print("typeDirectoryEntry = %s" % ("MATERIAL" if int.from_bytes(entry.typeDirectoryEntry) == 1 else "MESH") )
-            print("0x%X 0x%X" % (entry.field_4, entry.field_8))
+            print(f"0x{entry.field_4:X} 0x{entry.field_8:X}")
 
             type_dir_entry = int.from_bytes(entry.typeDirectoryEntry)
             if type_dir_entry == int(TypeDirectoryEntry.MATERIAL):
 
                 offset = entry.field_4
                 Material = nglMaterialBase.from_buffer_copy(buffer_bytes[offset : (offset + sizeof(nglMaterialBase))])
-                print("0x%08X" % Material.Name)
+                print(f"0x{Material.Name:08X}")
 
                 offset = Material.Name
                 MaterialName = tlFixedString.from_buffer_copy(buffer_bytes[offset : (offset + sizeof(tlFixedString))])
-                print("%s" % MaterialName.field_4)
+                print(f"{MaterialName.field_4}")
 
                 assert(Material.field_44 == 1)
 
@@ -395,7 +382,7 @@ def read_meshfile(file):
 
 
 def main(file):
-    name_pak, ext = splitext(file)
+    _, ext = splitext(file)
 
     if ext != ".PCMESH":
         print('Extension of file must be PCMESH')
