@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
-unpack = "usm.extract_pcpack:main"
+unpack = "usm.extract_pack:main"
 pack = "usm.build_pcpack:main"
 
 [build-system]
