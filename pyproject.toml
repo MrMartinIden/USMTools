@@ -8,7 +8,7 @@ dependencies = []
 
 [project.scripts]
 unpack = "usm.extract_pack:main"
-pack = "usm.build_pcpack:main"
+pack = "usm.build_pack:main"
 
 [build-system]
 requires = ["uv_build>=0.12.8,<0.13.0"]

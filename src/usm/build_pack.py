@@ -3,8 +3,14 @@ import os
 import sys
 from os.path import splitext
 
+from .parsers.pack import PackParser
 from .parsers.pcpack import PCPackParser
+from .parsers.xbpack import XBPackParser
 
+PARSERS: dict[str, PackParser] = {
+    ".PCPACK": PCPackParser(),
+    ".XBPACK": XBPackParser(),
+}
 
 def main():
     p = argparse.ArgumentParser(
@@ -21,11 +27,10 @@ def main():
         sys.exit("No .pack files found.")
 
     name_pak, ext = splitext(input_path)
+    parser = PARSERS.get(ext)
+    if parser is None:
+        sys.exit(f"No parser registered for {ext} pack files.")
 
-    if ext != ".PCPACK":
-        sys.exit("File must be contain *.PCPACK extension")
-
-    parser = PCPackParser()
     pack = parser.read(input_path)
     parser.build(name_pak, pack)
 
